@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cuartiles y Diagrama de Cajón</title>
+<style>
+body{font-family:Calibri,Arial,sans-serif;margin:0;background:#f5f7fb;color:#1f2937}
+header{background:#1f4e8c;color:#fff;padding:20px}.wrap{max-width:1150px;margin:auto;padding:18px}
+.card{background:#fff;border:1px solid #cfd8e3;border-radius:12px;padding:16px;margin:14px 0}
+h2,h3{color:#1f4e8c}textarea,input{width:100%;padding:10px;border:1px solid #bcc8d5;border-radius:8px;font:inherit}
+textarea{min-height:100px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}button{padding:10px 14px;border:0;border-radius:8px;background:#1f4e8c;color:#fff;font-weight:700;cursor:pointer;margin:6px 6px 0 0}
+.secondary{background:#e8eef6;color:#1f4e8c}.tabs button.active{background:#1f4e8c;color:white}.tabs button{background:white;color:#1f4e8c;border:1px solid #cfd8e3}
+.panel{display:none}.panel.active{display:block}.warn{background:#fff6df;border:1px solid #eed38c;padding:12px;border-radius:9px}
+.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.m{border:1px solid #d5dde7;padding:9px;text-align:center;border-radius:8px}.m b{display:block;color:#1f4e8c}.m span{font-size:20px;font-weight:700}
+table{border-collapse:collapse;width:100%;margin-top:10px}th,td{border:1px solid #cfd8e3;padding:8px;text-align:center}th{background:#dfeaf7}
+.chart{overflow:auto;border:1px solid #cfd8e3;border-radius:10px;padding:6px;background:white}.reading{margin-top:10px;padding:12px;border-left:5px solid #1f4e8c;background:#f8fbff;line-height:1.55}
+small{color:#667085}@media print{header,.tabs,button,.warn{display:none!important}.panel{display:block!important}}
+</style>
+</head>
+<body>
+<header><h1>Cuartiles y Diagrama de Cajón</h1><div>Datos no agrupados · 8.º Básico · Método trabajado en clases</div></header>
+<div class="wrap">
+<div class="warn"><b>Criterio:</b> Posición Qk = n·k/4. Si la posición es decimal, se toma la parte entera y se suma 1; si es exacta, se conserva. El diagrama usa mínimo, Q₁, Q₂, Q₃ y máximo.</div>
+
+<div class="tabs">
+<button class="active" onclick="tab('uno',this)">1 conjunto</button>
+<button onclick="tab('dos',this)">Comparar 2 conjuntos</button>
+<button onclick="tab('leer',this)">Cómo leer el diagrama</button>
+</div>
+
+<section id="uno" class="panel active">
+<div class="card">
+<h2>Analizar un conjunto</h2>
+<label>Nombre</label><input id="n1" value="Conjunto A"><br><br>
+<label>Datos</label><textarea id="d1" placeholder="18, 20, 22, 24, 26, 28, 30, 32..."></textarea>
+<small>Separa con comas, espacios, punto y coma o saltos de línea. Para decimales con coma usa punto y coma: 4,5; 5,2; 6,1.</small><br>
+<button onclick="analizar()">Calcular y graficar</button><button class="secondary" onclick="ej1()">Cargar ejemplo</button><button class="secondary" onclick="window.print()">Imprimir / PDF</button>
+<div id="e1"></div>
+</div>
+<div id="r1" style="display:none">
+<div class="card"><h3>Datos ordenados</h3><div id="ord1"></div><div class="summary" id="sum1"></div><table><thead><tr><th>Medida</th><th>Cálculo</th><th>Posición</th><th>Valor</th></tr></thead><tbody id="tb1"></tbody></table></div>
+<div class="card"><h3>Diagrama de cajón</h3><div class="chart" id="g1"></div><div class="reading" id="l1"></div></div>
+</div>
+</section>
+
+<section id="dos" class="panel">
+<div class="card">
+<h2>Comparar dos conjuntos</h2>
+<div class="grid">
+<div><label>Nombre A</label><input id="na" value="Curso A"><br><br><label>Datos A</label><textarea id="da"></textarea></div>
+<div><label>Nombre B</label><input id="nb" value="Curso B"><br><br><label>Datos B</label><textarea id="db"></textarea></div>
+</div>
+<small>Los dos diagramas se dibujan en la misma escala.</small><br>
+<button onclick="comparar()">Comparar y graficar</button><button class="secondary" onclick="ej2()">Cargar ejemplo</button><button class="secondary" onclick="window.print()">Imprimir / PDF</button>
+<div id="ec"></div>
+</div>
+<div id="rc" style="display:none">
+<div class="card"><h3>Comparación numérica</h3><table><thead><tr><th>Conjunto</th><th>Mín</th><th>Q₁</th><th>Q₂</th><th>Q₃</th><th>Máx</th><th>RIC</th><th>Rango</th></tr></thead><tbody id="tbc"></tbody></table></div>
+<div class="card"><h3>Diagramas comparados</h3><div class="chart" id="gc"></div><div class="reading" id="lc"></div></div>
+</div>
+</section>
+
+<section id="leer" class="panel">
+<div class="card"><h2>Cómo leer un diagrama de cajón</h2>
+<p><b>Mínimo:</b> dato más pequeño. <b>Q₁:</b> aproximadamente 25% de los datos queda en Q₁ o menos. <b>Q₂:</b> mediana. <b>Q₃:</b> aproximadamente 75% queda en Q₃ o menos. <b>Máximo:</b> dato mayor.</p>
+<p><b>La caja</b> contiene el 50% central. <b>RIC = Q₃ − Q₁</b> mide la dispersión central. <b>Rango = Máximo − Mínimo</b> mide la amplitud total.</p>
+<p>Si un bigote es mucho más largo que el otro, los datos se extienden más hacia ese lado. Si la mediana está desplazada dentro de la caja, uno de los tramos centrales es más amplio.</p>
+</div>
+</section>
+</div>
+
+<script>
+function tab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');b.classList.add('active')}
+function parse(s){s=(s||'').trim();if(!s)return[];if(/[;\n]/.test(s))return s.split(/[;\n]+/).map(x=>Number(x.trim().replace(',','.'))).filter(Number.isFinite);return s.split(/[,\s]+/).map(Number).filter(Number.isFinite)}
+function fmt(x){return Number.isInteger(x)?String(x):x.toFixed(2).replace(/\.?0+$/,'')}
+function q(d,k){let o=[...d].sort((a,b)=>a-b),raw=o.length*k/4,pos=Number.isInteger(raw)?raw:Math.floor(raw)+1;return{raw,pos,v:o[pos-1]}}
+function res(d){let o=[...d].sort((a,b)=>a-b),a=q(d,1),b=q(d,2),c=q(d,3);return{n:o.length,o,min:o[0],q1:a.v,q2:b.v,q3:c.v,max:o.at(-1),a,b,c,ric:c.v-a.v,rango:o.at(-1)-o[0]}}
+function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function escala(mi,ma){let sp=ma-mi||1,raw=sp/8,p=10**Math.floor(Math.log10(raw)),st=[1,2,5,10].map(x=>x*p).find(x=>x>=raw)||10*p;return{mi:Math.floor(mi/st)*st,ma:Math.ceil(ma/st)*st,st}}
+function svg(items){let mi=Math.min(...items.map(x=>x.r.min)),ma=Math.max(...items.map(x=>x.r.max)),s=escala(mi,ma),W=980,L=100,R=35,P=W-L-R,H=90+items.length*125,x=v=>L+(v-s.mi)/(s.ma-s.mi)*P,out=`<svg viewBox="0 0 ${W} ${H}" style="min-width:760px;width:100%">`;for(let t=s.mi;t<=s.ma+s.st/2;t+=s.st){let xx=x(t);out+=`<line x1="${xx}" y1="30" x2="${xx}" y2="${H-25}" stroke="#d7dee8"/><text x="${xx}" y="${H-6}" text-anchor="middle" font-family="Calibri" font-size="13">${fmt(t)}</text>`}items.forEach((it,i)=>{let r=it.r,y=70+i*125,top=y-23;out+=`<text x="8" y="${y+5}" font-family="Calibri" font-size="16" font-weight="700" fill="#1f4e8c">${esc(it.n)}</text><line x1="${x(r.min)}" y1="${y}" x2="${x(r.q1)}" y2="${y}" stroke="#1f4e8c" stroke-width="4"/><line x1="${x(r.q3)}" y1="${y}" x2="${x(r.max)}" y2="${y}" stroke="#1f4e8c" stroke-width="4"/><line x1="${x(r.min)}" y1="${y-15}" x2="${x(r.min)}" y2="${y+15}" stroke="#1f4e8c" stroke-width="4"/><line x1="${x(r.max)}" y1="${y-15}" x2="${x(r.max)}" y2="${y+15}" stroke="#1f4e8c" stroke-width="4"/><rect x="${x(r.q1)}" y="${top}" width="${Math.max(1,x(r.q3)-x(r.q1))}" height="46" fill="#dfeaf7" stroke="#1f4e8c" stroke-width="4"/><line x1="${x(r.q2)}" y1="${top}" x2="${x(r.q2)}" y2="${top+46}" stroke="#a63a3a" stroke-width="4"/>`;[[r.min,'Mín'],[r.q1,'Q₁'],[r.q2,'Q₂'],[r.q3,'Q₃'],[r.max,'Máx']].forEach(z=>out+=`<text x="${x(z[0])}" y="${y-31}" text-anchor="middle" font-family="Calibri" font-size="12">${z[1]}:${fmt(z[0])}</text>`) });return out+'</svg>'}
+function lectura(r,n){let lb=r.q2-r.q1,rb=r.q3-r.q2,lw=r.q1-r.min,rw=r.max-r.q3,t=Math.max(r.rango*.08,1e-9),L=lb+lw,R=rb+rw,forma=Math.abs(L-R)<=t?'La distribución se observa bastante equilibrada alrededor de la mediana.':R>L?'Los datos se extienden más hacia los valores altos.':'Los datos se extienden más hacia los valores bajos.',med=Math.abs(lb-rb)<=t?'La mediana está aproximadamente centrada dentro de la caja.':lb<rb?'La mediana está más cerca de Q₁, por lo que el tramo Q₂–Q₃ es más amplio.':'La mediana está más cerca de Q₃, por lo que el tramo Q₁–Q₂ es más amplio.';return `<b>${esc(n)}:</b> el 50% central se encuentra entre <b>${fmt(r.q1)}</b> y <b>${fmt(r.q3)}</b>. Mediana: <b>${fmt(r.q2)}</b>. RIC: <b>${fmt(r.ric)}</b>. Rango: <b>${fmt(r.rango)}</b>. ${forma} ${med}`}
+function metric(k,v){return `<div class="m"><b>${k}</b><span>${fmt(v)}</span></div>`}
+function analizar(){let d=parse(d1.value);if(d.length<4){e1.innerHTML='<div class="warn">Ingresa al menos 4 datos.</div>';return}e1.innerHTML='';let n=n1.value||'Conjunto A',r=res(d);ord1.textContent=r.o.map(fmt).join(', ');sum1.innerHTML=metric('n',r.n)+metric('Mínimo',r.min)+metric('Q₁',r.q1)+metric('Q₂',r.q2)+metric('Q₃',r.q3)+metric('Máximo',r.max);tb1.innerHTML=[['Q₁',r.a,1],['Q₂',r.b,2],['Q₃',r.c,3]].map(z=>`<tr><td>${z[0]}</td><td>${r.n}·${z[2]}/4 = ${fmt(z[1].raw)}</td><td>${z[1].pos}</td><td>${fmt(z[1].v)}</td></tr>`).join('');g1.innerHTML=svg([{n,r}]);l1.innerHTML=lectura(r,n)+`<br><br>Aproximadamente 25% de los datos se ubica en ${fmt(r.q1)} o menos; 50% en ${fmt(r.q2)} o menos; y 75% en ${fmt(r.q3)} o menos.`;r1.style.display='block';localStorage.setItem('d1',d1.value)}
+function comparar(){let A=parse(da.value),B=parse(db.value);if(A.length<4||B.length<4){ec.innerHTML='<div class="warn">Cada conjunto debe tener al menos 4 datos.</div>';return}ec.innerHTML='';let Aname=na.value||'A',Bname=nb.value||'B',ra=res(A),rb=res(B);tbc.innerHTML=[[Aname,ra],[Bname,rb]].map(z=>`<tr><td>${esc(z[0])}</td><td>${fmt(z[1].min)}</td><td>${fmt(z[1].q1)}</td><td>${fmt(z[1].q2)}</td><td>${fmt(z[1].q3)}</td><td>${fmt(z[1].max)}</td><td>${fmt(z[1].ric)}</td><td>${fmt(z[1].rango)}</td></tr>`).join('');gc.innerHTML=svg([{n:Aname,r:ra},{n:Bname,r:rb}]);let c=[];c.push(ra.q2>rb.q2?`${Aname} tiene mayor mediana.`:rb.q2>ra.q2?`${Bname} tiene mayor mediana.`:'Ambos tienen la misma mediana.');c.push(ra.ric<rb.ric?`${Aname} tiene el 50% central más concentrado.`:rb.ric<ra.ric?`${Bname} tiene el 50% central más concentrado.`:'Ambos tienen igual RIC.');c.push(ra.rango<rb.rango?`${Aname} tiene menor amplitud total.`:rb.rango<ra.rango?`${Bname} tiene menor amplitud total.`:'Ambos tienen igual rango.');lc.innerHTML='<b>Comparación:</b> '+c.join(' ')+'<hr>'+lectura(ra,Aname)+'<br><br>'+lectura(rb,Bname);rc.style.display='block';localStorage.setItem('da',da.value);localStorage.setItem('db',db.value)}
+function ej1(){n1.value='Minutos de lectura';d1.value='42, 18, 32, 24, 46, 20, 38, 28, 44, 22, 36, 26, 48, 30, 40, 34';analizar()}
+function ej2(){na.value='Curso A';da.value='18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48';nb.value='Curso B';db.value='12,16,18,22,25,27,29,31,33,35,37,41,45,49,54,60';comparar()}
+window.onload=()=>{if(localStorage.d1)d1.value=localStorage.d1;if(localStorage.da)da.value=localStorage.da;if(localStorage.db)db.value=localStorage.db}
+</script>
+</body></html>
